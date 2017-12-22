@@ -117,6 +117,8 @@ jobs:
               fi
               sleep 2
             done
+
+            make kubelink
       - run: ./integration --logtostderr -hub $HUB -tag $TAG -mixer=false -auth=enable -errorlogsdir=/home/circleci/logs -use-initializer
       - store_artifacts:
           path: /home/circleci/logs
