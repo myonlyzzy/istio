@@ -118,7 +118,7 @@ jobs:
               sleep 2
             done
 
-            make kubelink
+            ln -s ${KUBECONFIG} pilot/platform/kube/config
       - run: ./integration --logtostderr -hub $HUB -tag $TAG -mixer=false -auth=enable -errorlogsdir=/home/circleci/logs -use-initializer
       - store_artifacts:
           path: /home/circleci/logs
