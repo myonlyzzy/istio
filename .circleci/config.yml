@@ -36,6 +36,11 @@ jobs:
         command: |
           sudo mkdir -p /go/src/istio.io/istio
           sudo chown -R circleci /go
+          cat /etc/resolv.conf
+          cp /etc/resolv.conf /tmp
+
+          echo "search cluster.local" >> /tmp/resolv.conf
+          sudo cp /tmp/resolv.conf /etc/resolv.conf
       - checkout
       - attach_workspace:
           at:  /go
