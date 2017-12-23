@@ -327,7 +327,6 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-      - restore_cache:
           keys:
             - dep-cache-{{ checksum "Gopkg.toml" }}-{{ checksum "WORKSPACE" }}
       - run:
@@ -350,6 +349,7 @@ workflows:
            filters:
              branches:
                only:
+                 - master
                  - gobuild
     jobs:
       - dependencies
