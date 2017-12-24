@@ -20,7 +20,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
 )
 
 func TestCloudFoundry(t *testing.T) {
