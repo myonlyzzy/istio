@@ -188,6 +188,26 @@ jobs:
       - store_artifacts:
           path: /home/circleci/logs
 
+  # Run nightly, to verify 'dep update' works and prime the cache
+  depupdate:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          command: |
+            make dep.update
+      - save_cache:
+          key: dep-cache-{{ checksum "Gopkg.lock" }}
+          paths:
+            - /go/src/istio.io/istio/vendor
+      - run:
+          command: |
+            make
+            mkdir -p ${GOPATH}/dist
+            tar cvfz ${GOPATH}/dist/istio-vendor.tgz vendor
+      - store_artifacts:
+          path: ${GOPATH}/dist/istio-vendor.tgz
+
   dependencies:
     <<: *defaults
     steps:
@@ -222,24 +242,7 @@ jobs:
       - run:
           command: |
             cd /go/src/istio.io/istio
-            if [ ! -d vendor ]; then
-               dep ensure
-            fi
-      - run:
-          command: |
-            mkdir ~/.kube
-            cp /go/src/istio.io/istio/.circleci/config ~/.kube/config
-            ln -s ~/.kube/config /go/src/istio.io/istio/pilot/platform/kube/config
-      - run:
-          command: |
-            mkdir ~/envoy
-            cd ~/envoy
-            ISTIO_PROXY_BUCKET=$(sed 's/ = /=/' <<< $( awk '/ISTIO_PROXY_BUCKET =/' /go/src/istio.io/istio/WORKSPACE))
-            PROXYVERSION=$(sed 's/[^"]*"\([^"]*\)".*/\1/' <<<  $ISTIO_PROXY_BUCKET)
-            PROXY=debug-$PROXYVERSION
-            wget -qO- https://storage.googleapis.com/istio-build/proxy/envoy-$PROXY.tar.gz | tar xvz
-            ln -sf ~/envoy/usr/local/bin/envoy /go/src/istio.io/istio/pilot/proxy/envoy/envoy
-
+            make init
       - run: cd /go/src/istio.io/istio; maxprocs=6 bin/parallel-codecov.sh pilot
       - run:
           command: |
@@ -403,6 +406,18 @@ workflows:
           context: org-global
           requires:
             - pilot-integration-auth
+
+  # Verify the latest version of dependencies can build
+  nightly-dep:
+    triggers:
+       - schedule:
+           cron: "0 1 * * *"
+           filters:
+             branches:
+               only:
+                 - master
+    jobs:
+      - depupdate
 
   all:
     jobs:

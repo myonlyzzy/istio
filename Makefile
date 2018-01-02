@@ -89,6 +89,12 @@ setup: pilot/platform/kube/config
 
 depend: depend.ensure
 
+# Target to update the Gopkg.lock with latest versions.
+# Should be run when adding any new dependency and periodically.
+dep.udate:
+	dep ensure -update
+	cp Gopkg.lock vendor/Gopkg.lock
+
 ${GOPATH}/bin/dep:
 	go get -u github.com/golang/dep/cmd/dep
 
@@ -111,8 +117,12 @@ depend.graph: Gopkg.lock ; $(info $(H) visualizing dependency graph...)
 depend.vendor: vendor
 	$(Q) dep ensure -vendor-only
 
-vendor:
-	dep ensure -update
+vendor: vendor/Gopkg.lock
+
+# Update vendor and vendor/gopkg.lock if the lock file is changed
+vendor/Gopkg.lock: Gopkg.lock ${GOPATH}/bin/dep
+	${GOPATH}/bin/dep ensure -vendor-only
+	cp Gopkg.lock vendor/Gopkg.lock
 
 lint:
 	SKIP_INIT=1 bin/linters.sh
@@ -120,6 +130,11 @@ lint:
 # Target run by the pre-commit script, to automate formatting and lint
 # If pre-commit script is not used, please run this manually.
 pre-commit: fmt lint
+
+# Downloads envoy, based on the SHA defined in the base pilot Dockerfile
+# Will also check vendor, based on Gopkg.lock
+init:
+	@bin/init.sh
 
 #-----------------------------------------------------------------------------
 # Target: precommit
