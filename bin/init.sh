@@ -22,15 +22,7 @@ if [ ${ROOT} != "${GOPATH-$HOME/go}/src/istio.io/istio" ]; then
        exit 1
 fi
 
-# Download dependencies
-if [ ! -d vendor/github.com ]; then
-    if which dep; then
-        echo "Using $(which dep)"
-    else
-        go get -u github.com/golang/dep/cmd/dep
-    fi
-    dep ensure
-fi
+make vendor
 
 # Original circleci - replaced with the version in the dockerfile, as we deprecate bazel
 #ISTIO_PROXY_BUCKET=$(sed 's/ = /=/' <<< $( awk '/ISTIO_PROXY_BUCKET =/' WORKSPACE))
