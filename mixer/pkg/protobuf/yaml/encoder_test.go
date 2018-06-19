@@ -28,8 +28,6 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
-
-	"istio.io/istio/mixer/pkg/protobuf/yaml/testdata/all"
 )
 
 var (

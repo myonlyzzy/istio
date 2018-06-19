@@ -30,7 +30,6 @@ import (
 	"istio.io/istio/mixer/pkg/lang/ast"
 	"istio.io/istio/mixer/pkg/lang/compiled"
 	protoyaml "istio.io/istio/mixer/pkg/protobuf/yaml"
-	"istio.io/istio/mixer/pkg/protobuf/yaml/testdata/all"
 )
 
 func TestEncodeVarintZeroExtend(t *testing.T) {
